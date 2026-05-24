@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guess the Number</title>
+  <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #111827;
+      --card: rgba(15, 23, 42, 0.88);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #22c55e;
+      --accent-2: #38bdf8;
+      --danger: #fb7185;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.28), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.18), transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(100%, 520px);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      backdrop-filter: blur(10px);
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 0.75rem;
+      color: var(--accent-2);
+      margin: 0 0 10px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.05;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .game {
+      margin-top: 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .stat {
+      flex: 1 1 140px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat span {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .stat strong {
+      font-size: 1.2rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    input {
+      flex: 1 1 180px;
+      min-height: 52px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      font-size: 1rem;
+      padding: 0 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: rgba(56, 189, 248, 0.7);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
+    }
+
+    button {
+      min-height: 52px;
+      border: 0;
+      border-radius: 14px;
+      padding: 0 18px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: #08111f;
+      min-width: 130px;
+    }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .message {
+      min-height: 28px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .message.error {
+      color: var(--danger);
+    }
+
+    .footer {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 22px;
+        border-radius: 20px;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .primary,
+      .secondary,
+      input {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card" aria-labelledby="title">
+    <p class="eyebrow">Mini Game</p>
+    <h1 id="title">Guess the Number</h1>
+    <p>Pick a number from 1 to 100. You get immediate feedback after every guess.</p>
+
+    <section class="game" aria-label="Guess the number game">
+      <div class="stats">
+        <div class="stat">
+          <span>Attempts</span>
+          <strong id="attempts">0</strong>
+        </div>
+        <div class="stat">
+          <span>Range</span>
+          <strong>1 - 100</strong>
+        </div>
+        <div class="stat">
+          <span>Status</span>
+          <strong id="status">Ready</strong>
+        </div>
+      </div>
+
+      <form class="controls" id="guessForm" method="post" action="/guess">
+        <input id="guessInput" type="number" min="1" max="100" placeholder="Enter your guess" aria-label="Enter your guess" />
+        <button class="primary" id="guessButton" type="submit">Guess</button>
+      </form>
+
+      <form class="controls" id="resetForm" method="post" action="/new-game">
+        <button class="secondary" id="resetButton" type="submit">New Game</button>
+      </form>
+
+      <div id="message" class="message" aria-live="polite"></div>
+      <div class="footer">Tip: close guesses are labeled as warm or cold.</div>
+    </section>
+  </main>
+
+  <script>
+    const guessInput = document.getElementById('guessInput');
+    const guessButton = document.getElementById('guessButton');
+    const resetButton = document.getElementById('resetButton');
+    const guessForm = document.getElementById('guessForm');
+    const resetForm = document.getElementById('resetForm');
+    const attemptsElement = document.getElementById('attempts');
+    const statusElement = document.getElementById('status');
+    const messageElement = document.getElementById('message');
+
+    let attempts = 0;
+    let gameOver = false;
+
+    function setMessage(text, isError = false) {
+      messageElement.textContent = text;
+      messageElement.classList.toggle('error', isError);
+    }
+
+    function updateStatus(text) {
+      statusElement.textContent = text;
+    }
+
+    async function resetGame() {
+      await fetch(resetForm.action, {
+        method: resetForm.method.toUpperCase(),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      attempts = 0;
+      gameOver = false;
+      attemptsElement.textContent = String(attempts);
+      updateStatus('Ready');
+      setMessage('New game started. Make your guess.');
+      guessInput.value = '';
+      guessInput.disabled = false;
+      guessButton.disabled = false;
+      guessInput.focus();
+    }
+
+    async function evaluateGuess() {
+      if (gameOver) {
+        setMessage('Start a new game to play again.', true);
+        return;
+      }
+
+      const guess = Number(guessInput.value);
+
+      if (!Number.isInteger(guess) || guess < 1 || guess > 100) {
+        setMessage('Enter a whole number from 1 to 100.', true);
+        updateStatus('Invalid input');
+        return;
+      }
+
+      try {
+        const response = await fetch(guessForm.action, {
+          method: guessForm.method.toUpperCase(),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ guess })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setMessage(data.error || 'Something went wrong.', true);
+          updateStatus('Invalid input');
+          return;
+        }
+
+        attempts = data.attempts ?? attempts + 1;
+        attemptsElement.textContent = String(attempts);
+        setMessage(data.message || 'Try again.');
+        updateStatus(data.status || 'Keep guessing');
+
+        if (data.result === 'correct') {
+          gameOver = true;
+          guessInput.disabled = true;
+          guessButton.disabled = true;
+        }
+      } catch (error) {
+        setMessage('Unable to reach the server.', true);
+        updateStatus('Error');
+      }
+    }
+
+    guessForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      evaluateGuess();
+    });
+
+    resetForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      resetGame();
+    });
+
+    resetGame();
+  </script>
+</body>
+</html>
