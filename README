@@ -1,0 +1,57 @@
+# Guessing Game - Docker Guide
+
+A simple guessing game application that can be easily run using Docker.
+
+## Prerequisites
+
+- Docker installed on your system
+- Docker running in the background
+
+## Building the Docker Image
+
+To build the Docker image for this application, run:
+
+```bash
+docker build -t guessing-game .
+```
+
+This command builds an image named `guessing-game` using the Dockerfile in the project directory.
+
+## Running the Container
+
+To run the guessing game in a Docker container:
+
+```bash
+docker run -p 5000:5000 guessing-game
+```
+
+This will:
+- Start a container from the `guessing-game` image
+- Map port 5000 from the container to port 5000 on your local machine
+- The game will be accessible at `http://localhost:5000`
+
+## Stopping the Container
+
+To stop a running container, press `Ctrl+C` in the terminal where it's running, or use:
+
+```bash
+docker stop <container_id>
+```
+
+## Project Structure
+
+- `main/server/app.py` - Main Flask application
+- `main/business/business_service.py` - Game logic
+- `main/presentation/index.html` - Web interface
+- `requirements.txt` - Python dependencies
+- `Dockerfile` - Docker configuration
+
+## Troubleshooting
+
+If port 5000 is already in use, you can map to a different port:
+
+```bash
+docker run -p 8000:5000 guessing-game
+```
+
+Then access the game at `http://localhost:8000`
